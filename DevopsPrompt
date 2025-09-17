@@ -1,0 +1,1299 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT-5 DevOps Infrastructure Design: A Complete Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'serif': ['Playfair Display', 'serif'],
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#1e3a8a',
+                        secondary: '#64748b',
+                        accent: '#f8fafc',
+                        muted: '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-overlay {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.9) 0%, rgba(100, 116, 139, 0.7) 100%);
+        }
+        .text-shadow {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .backdrop-blur-sm {
+            backdrop-filter: blur(4px);
+        }
+        .toc-fixed {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            width: 280px;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            z-index: 40;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        .content-offset {
+            margin-left: 320px;
+        }
+        @media (max-width: 1024px) {
+            .toc-fixed {
+                display: none;
+            }
+            .content-offset {
+                margin-left: 0;
+            }
+        }
+        .citation-link {
+            color: #1e3a8a;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .citation-link:hover {
+            color: #3730a3;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+        @media (max-width: 768px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+            }
+            .toc-fixed {
+                display: none;
+            }
+            .content-offset {
+                margin-left: 0;
+            }
+        }
+    </style>
+  </head>
+
+  <body class="bg-slate-50 font-sans text-gray-800 leading-relaxed">
+
+    <!-- Fixed Table of Contents -->
+    <nav class="toc-fixed rounded-lg shadow-lg">
+      <div class="p-6">
+        <h3 class="font-serif font-semibold text-lg text-primary mb-4">Table of Contents</h3>
+        <ul class="space-y-2 text-sm">
+          <li>
+            <a href="#introduction" class="text-secondary hover:text-primary transition-colors">Introduction</a>
+          </li>
+          <li>
+            <a href="#core-structure" class="text-secondary hover:text-primary transition-colors">Core Prompt Structure</a>
+          </li>
+          <li class="ml-4">
+            <a href="#role-definition" class="text-muted hover:text-primary transition-colors">Role Definition</a>
+          </li>
+          <li class="ml-4">
+            <a href="#task-objective" class="text-muted hover:text-primary transition-colors">Task and Objective</a>
+          </li>
+          <li class="ml-4">
+            <a href="#input-requirements" class="text-muted hover:text-primary transition-colors">Input Requirements</a>
+          </li>
+          <li class="ml-4">
+            <a href="#expected-output" class="text-muted hover:text-primary transition-colors">Expected Output</a>
+          </li>
+          <li>
+            <a href="#infrastructure-components" class="text-secondary hover:text-primary transition-colors">Infrastructure Components</a>
+          </li>
+          <li class="ml-4">
+            <a href="#iac" class="text-muted hover:text-primary transition-colors">Infrastructure as Code</a>
+          </li>
+          <li class="ml-4">
+            <a href="#network-security" class="text-muted hover:text-primary transition-colors">Network Architecture</a>
+          </li>
+          <li class="ml-4">
+            <a href="#cicd" class="text-muted hover:text-primary transition-colors">CI/CD Pipeline</a>
+          </li>
+          <li class="ml-4">
+            <a href="#monitoring" class="text-muted hover:text-primary transition-colors">Monitoring & Logging</a>
+          </li>
+          <li class="ml-4">
+            <a href="#software-config" class="text-muted hover:text-primary transition-colors">Software Configuration</a>
+          </li>
+          <li>
+            <a href="#advanced-capabilities" class="text-secondary hover:text-primary transition-colors">Advanced Capabilities</a>
+          </li>
+          <li class="ml-4">
+            <a href="#multi-cloud" class="text-muted hover:text-primary transition-colors">Multi-Cloud Deployments</a>
+          </li>
+          <li class="ml-4">
+            <a href="#security-compliance" class="text-muted hover:text-primary transition-colors">Security & Compliance</a>
+          </li>
+          <li class="ml-4">
+            <a href="#cost-optimization" class="text-muted hover:text-primary transition-colors">Cost Optimization</a>
+          </li>
+          <li class="ml-4">
+            <a href="#troubleshooting" class="text-muted hover:text-primary transition-colors">Troubleshooting</a>
+          </li>
+          <li>
+            <a href="#sample-scenarios" class="text-secondary hover:text-primary transition-colors">Sample Scenarios</a>
+          </li>
+          <li class="ml-4">
+            <a href="#aws-web-app" class="text-muted hover:text-primary transition-colors">AWS Web Application</a>
+          </li>
+          <li class="ml-4">
+            <a href="#kubernetes-gcp" class="text-muted hover:text-primary transition-colors">Kubernetes on GCP</a>
+          </li>
+          <li class="ml-4">
+            <a href="#secure-cicd" class="text-muted hover:text-primary transition-colors">Secure CI/CD Pipeline</a>
+          </li>
+          <li class="ml-4">
+            <a href="#disaster-recovery" class="text-muted hover:text-primary transition-colors">Disaster Recovery</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content-offset">
+
+      <!-- Hero Section -->
+      <section class="relative bg-white overflow-hidden">
+        <div class="hero-grid max-w-7xl mx-auto px-6 py-16">
+          <div class="relative">
+            <div class="absolute inset-0 gradient-overlay rounded-3xl"></div>
+            <img src="https://kimi-img.moonshot.cn/pub/icon/spinner.svg" alt="Cloud infrastructure with network connections" class="w-full h-80 object-cover rounded-3xl shadow-2xl" size="large" aspect="wide" color="blue" style="photo" query="cloud infrastructure network" referrerpolicy="no-referrer" />
+          </div>
+          <div class="space-y-6">
+            <h1 class="font-serif text-4xl md:text-5xl font-bold text-primary leading-tight">
+              <em class="italic">ChatGPT-5 as Your</em>
+              <br>
+              DevOps Engineer
+            </h1>
+            <p class="text-xl text-secondary font-medium">
+              A comprehensive guide to infrastructure design and software setup
+            </p>
+            <div class="flex items-center space-x-4 text-sm text-muted">
+              <span class="flex items-center">
+                <i class="fas fa-cloud mr-2"></i>
+                Cloud Infrastructure
+              </span>
+              <span class="flex items-center">
+                <i class="fas fa-code mr-2"></i>
+                Infrastructure as Code
+              </span>
+              <span class="flex items-center">
+                <i class="fas fa-shield-alt mr-2"></i>
+                Security & Compliance
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Key Highlights -->
+      <section class="bg-accent py-12">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="grid md:grid-cols-3 gap-8">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-robot text-white text-2xl"></i>
+              </div>
+              <h3 class="font-serif text-lg font-semibold mb-2">AI-Powered Infrastructure</h3>
+              <p class="text-secondary text-sm">Transform ChatGPT-5 from a simple code generator into a collaborative DevOps partner</p>
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-cogs text-white text-2xl"></i>
+              </div>
+              <h3 class="font-serif text-lg font-semibold mb-2">Complete Solutions</h3>
+              <p class="text-secondary text-sm">Generate production-ready infrastructure designs with comprehensive automation scripts</p>
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-rocket text-white text-2xl"></i>
+              </div>
+              <h3 class="font-serif text-lg font-semibold mb-2">Accelerated Delivery</h3>
+              <p class="text-secondary text-sm">Reduce manual effort and accelerate project timelines with structured prompts</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Introduction -->
+      <section id="introduction" class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-8">The Art of Prompting DevOps Excellence</h2>
+
+          <div class="prose prose-lg max-w-none">
+            <p class="text-lg text-secondary leading-relaxed mb-6">
+              To effectively use ChatGPT-5 as a DevOps engineer for infrastructure design and software setup, you need to provide a highly structured and detailed prompt. This prompt should define the AI's role (e.g., "Senior DevOps Engineer"), specify the task (e.g., "Design a production-ready infrastructure for a microservices application on AWS"), and provide comprehensive inputs about the application, technology stack, and constraints.
+            </p>
+
+            <p class="text-secondary leading-relaxed mb-6">
+              The expected output should also be clearly defined, including Infrastructure as Code (IaC) scripts, CI/CD pipeline configurations, and documentation. This approach transforms the AI from a simple code generator into a collaborative partner capable of producing a complete, robust, and secure infrastructure solution.
+            </p>
+
+            <div class="bg-primary/5 border-l-4 border-primary p-6 my-8 rounded-r-lg">
+              <blockquote class="font-serif text-xl italic text-primary">
+                "A well-structured prompt is the difference between generic code generation and architectural excellence."
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Core Prompt Structure -->
+      <section id="core-structure" class="py-16 bg-slate-100">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12 text-center">Core Prompt Structure</h2>
+
+          <div class="grid lg:grid-cols-2 gap-12">
+            <div>
+              <img src="https://kimi-img.moonshot.cn/pub/icon/spinner.svg" alt="Computer screen displaying infrastructure as code" class="w-full h-64 object-cover rounded-xl shadow-lg mb-6" size="medium" aspect="wide" style="photo" query="infrastructure as code on computer screen" referrerpolicy="no-referrer" />
+
+              <p class="text-secondary leading-relaxed">
+                A comprehensive prompt ensures that the generated output is accurate, relevant, and directly applicable to the user's needs. The structure should be designed to guide the AI through a logical workflow, from understanding the high-level requirements to implementing the detailed configurations.
+              </p>
+            </div>
+
+            <div class="space-y-6">
+              <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-3">Role Definition</h3>
+                <p class="text-secondary text-sm mb-3">Set the context and expertise level for the AI</p>
+                <div class="bg-slate-50 p-4 rounded-lg text-sm font-mono text-primary">
+                  "Act as a Senior DevOps Engineer specializing in cloud infrastructure design and automation"
+                </div>
+              </div>
+
+              <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-3">Task Specification</h3>
+                <p class="text-secondary text-sm mb-3">Clearly articulate the primary task and its objective</p>
+                <div class="bg-slate-50 p-4 rounded-lg text-sm font-mono text-primary">
+                  "Design and implement a complete infrastructure for a containerized microservice application on AWS"
+                </div>
+              </div>
+
+              <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-3">Expected Output</h3>
+                <p class="text-secondary text-sm mb-3">Define deliverables and formatting requirements</p>
+                <div class="bg-slate-50 p-4 rounded-lg text-sm font-mono text-primary">
+                  "Generate modular Terraform scripts with explanatory comments and setup documentation"
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Role Definition -->
+      <section id="role-definition" class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-8">Role Definition: Setting the Expertise Context</h2>
+
+          <div class="prose prose-lg max-w-none">
+            <p class="text-lg text-secondary leading-relaxed mb-6">
+              The initial and most critical step in crafting an effective prompt is to define the role that ChatGPT-5 will assume. This sets the context and expertise level for the AI, ensuring that the responses are aligned with the expectations of a seasoned DevOps professional.
+            </p>
+
+            <p class="text-secondary leading-relaxed mb-6">
+              Instead of a generic request, the prompt should explicitly state the role, such as <strong>"Act as a Senior DevOps Engineer specializing in cloud infrastructure design and automation"</strong>
+              <a href="https://aws.plainenglish.io/the-prompt-library-that-saved-my-team-40-hours-this-week-71fae4c99234" class="citation-link" target="_blank">[536]</a>. This role definition immediately frames the AI's perspective, enabling it to draw upon a vast repository of knowledge related to DevOps best practices, tools, and methodologies.
+            </p>
+
+            <div class="bg-primary/5 p-6 rounded-xl my-8">
+              <h4 class="font-serif text-lg font-semibold text-primary mb-4">Example Role Definitions</h4>
+              <ul class="space-y-3 text-secondary">
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-primary mt-1 mr-3"></i>
+                  <span>"Act as a DevOps engineer with expertise in AWS, Terraform, and Kubernetes" <a href="https://www.linkedin.com/pulse/100-most-commonly-used-devops-prompts-chatgpt-khadar-basha-shaik-trgpc" class="citation-link" target="_blank">[526]</a></span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-primary mt-1 mr-3"></i>
+                  <span>"You are a Senior Infrastructure Architect with expertise in business continuity and disaster recovery planning"</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-check-circle text-primary mt-1 mr-3"></i>
+                  <span>"Act as a DevSecOps engineer with expertise in creating secure CI/CD pipelines"</span>
+                </li>
+              </ul>
+            </div>
+
+            <p class="text-secondary leading-relaxed">
+              This level of specificity is crucial for obtaining actionable and contextually appropriate results, as it primes the AI to consider factors like cost optimization, security hardening, and performance tuning from the outset.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Task and Objective -->
+      <section id="task-objective" class="py-16 bg-slate-100">
+        <div class="max-w-4xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-8">Task and Objective: Defining Clear Goals</h2>
+
+          <div class="prose prose-lg max-w-none">
+            <p class="text-lg text-secondary leading-relaxed mb-6">
+              After defining the role, the prompt must clearly articulate the primary task and its objective. This section should be direct and unambiguous, outlining what the user wants to achieve.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 my-8">
+              <div class="bg-white p-6 rounded-xl shadow-sm">
+                <h4 class="font-serif text-lg font-semibold text-primary mb-4">Well-Defined Task Example</h4>
+                <blockquote class="border-l-4 border-primary pl-4 italic text-secondary">
+                  "Design and implement a complete infrastructure for a containerized microservice application on AWS" <a href="https://www.zibtek.com/blog/mastering-devops-essential-chatgpt-prompts-to-boost/" class="citation-link" target="_blank">[490]</a>
+                </blockquote>
+              </div>
+
+              <div class="bg-white p-6 rounded-xl shadow-sm">
+                <h4 class="font-serif text-lg font-semibold text-primary mb-4">Clear Objective</h4>
+                <blockquote class="border-l-4 border-primary pl-4 italic text-secondary">
+                  "The goal is to create a scalable, secure, and cost-effective environment that supports continuous integration and continuous deployment (CI/CD)"
+                </blockquote>
+              </div>
+            </div>
+
+            <p class="text-secondary leading-relaxed mb-6">
+              The task should be broken down into manageable components, such as infrastructure provisioning, network configuration, CI/CD pipeline setup, and monitoring implementation. By providing a clear objective, the user can guide the AI to produce a holistic and integrated solution rather than a collection of disparate scripts.
+            </p>
+
+            <div class="bg-primary/5 border-l-4 border-primary p-6 rounded-r-lg">
+              <h4 class="font-serif text-lg font-semibold text-primary mb-3">Complex Task Example</h4>
+              <p class="text-secondary italic">
+                "Create a disaster recovery plan for a critical application hosted on Azure, including RTO/RPO requirements and step-by-step recovery procedures" <a href="https://www.linkedin.com/posts/ebangha-ebane_8-prompts-devop-engineer-can-use-activity-7355939165407965184-Nd04" class="citation-link" target="_blank">[485]</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Input Requirements -->
+      <section id="input-requirements" class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12 text-center">Input Requirements: Building the Blueprint</h2>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <div class="bg-gradient-to-br from-primary/5 to-primary/10 p-8 rounded-xl">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                <i class="fas fa-layer-group text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Application & Architecture</h3>
+              <ul class="space-y-2 text-sm text-secondary">
+                <li>• Application type and framework</li>
+                <li>• Technology stack details</li>
+                <li>• Expected traffic and performance</li>
+                <li>• Deployment model preferences</li>
+              </ul>
+              <div class="mt-4 text-xs text-muted">
+                <strong>Example:</strong> "Node.js microservice with PostgreSQL and Redis, handling 10M requests/day" <a href="https://aws.plainenglish.io/the-prompt-library-that-saved-my-team-40-hours-this-week-71fae4c99234" class="citation-link" target="_blank">[536]</a>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-primary/5 to-primary/10 p-8 rounded-xl">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                <i class="fas fa-cloud text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Cloud & Technology Stack</h3>
+              <ul class="space-y-2 text-sm text-secondary">
+                <li>• Target cloud provider</li>
+                <li>• Preferred IaC tools</li>
+                <li>• Container orchestration</li>
+                <li>• CI/CD and monitoring tools</li>
+              </ul>
+              <div class="mt-4 text-xs text-muted">
+                <strong>Example:</strong> "AWS using EC2, S3, RDS with Terraform and Kubernetes" <a href="https://www.linkedin.com/pulse/100-most-commonly-used-devops-prompts-chatgpt-khadar-basha-shaik-trgpc" class="citation-link" target="_blank">[526]</a>
+              </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-primary/5 to-primary/10 p-8 rounded-xl">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                <i class="fas fa-shield-alt text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Constraints & Requirements</h3>
+              <ul class="space-y-2 text-sm text-secondary">
+                <li>• Budget constraints</li>
+                <li>• Security requirements</li>
+                <li>• Compliance standards</li>
+                <li>• Performance & availability SLAs</li>
+              </ul>
+              <div class="mt-4 text-xs text-muted">
+                <strong>Example:</strong> "Monitoring budget ≤$500/month, 99.9% uptime, SOC 2 compliance" <a href="https://aws.plainenglish.io/the-prompt-library-that-saved-my-team-40-hours-this-week-71fae4c99234" class="citation-link" target="_blank">[536]</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Expected Output -->
+      <section id="expected-output" class="py-16 bg-slate-100">
+        <div class="max-w-4xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-8">Expected Output: Defining Deliverables</h2>
+
+          <div class="prose prose-lg max-w-none">
+            <p class="text-lg text-secondary leading-relaxed mb-6">
+              The final section of the prompt should clearly state the expected output and deliverables. This ensures that the AI provides the information in a format that is useful and easy to work with.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 my-8">
+              <div class="space-y-4">
+                <h4 class="font-serif text-lg font-semibold text-primary">Specific Deliverables</h4>
+                <ul class="space-y-2 text-secondary">
+                  <li class="flex items-center">
+                    <i class="fas fa-code text-primary mr-3"></i>
+                    <span>Complete Terraform scripts for infrastructure provisioning</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-cogs text-primary mr-3"></i>
+                    <span>Jenkinsfile or GitHub Actions workflow configurations</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-chart-line text-primary mr-3"></i>
+                    <span>Monitoring and alerting configurations</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-book text-primary mr-3"></i>
+                    <span>Documentation with architecture diagrams</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="space-y-4">
+                <h4 class="font-serif text-lg font-semibold text-primary">Formatting Requirements</h4>
+                <ul class="space-y-2 text-secondary">
+                  <li class="flex items-center">
+                    <i class="fas fa-comment text-primary mr-3"></i>
+                    <span>Code with explanatory comments</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-file-alt text-primary mr-3"></i>
+                    <span>Markdown documentation with setup instructions</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-folder text-primary mr-3"></i>
+                    <span>Modular, reusable code structures</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-check-double text-primary mr-3"></i>
+                    <span>Production-ready configurations</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <p class="text-secondary leading-relaxed">
+              By clearly defining the expected output, the user can ensure that the AI's response is directly applicable to their project, saving time and effort in post-processing and implementation. This also helps to set clear expectations and ensures that the AI's capabilities are utilized to their full potential.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Infrastructure Components -->
+      <section id="infrastructure-components" class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12 text-center">Key Infrastructure Components</h2>
+
+          <p class="text-lg text-secondary text-center leading-relaxed mb-12 max-w-4xl mx-auto">
+            When using ChatGPT-5 as a DevOps engineer, the AI can assist in designing and implementing a wide range of infrastructure components, from provisioning underlying resources to configuring application software.
+          </p>
+
+          <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <img src="https://kimi-img.moonshot.cn/pub/icon/spinner.svg" alt="Infrastructure as code implementation in modern DevOps environment" class="w-full h-80 object-cover rounded-xl shadow-lg" size="medium" aspect="wide" style="photo" query="infrastructure as code devops" referrerpolicy="no-referrer" />
+            </div>
+
+            <div class="space-y-6">
+              <div class="flex items-start space-x-4">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-code text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-serif text-xl font-semibold text-primary mb-2">Infrastructure as Code (IaC)</h3>
+                  <p class="text-secondary text-sm">Generate Terraform, CloudFormation, and Pulumi templates for automated resource provisioning</p>
+                </div>
+              </div>
+
+              <div class="flex items-start space-x-4">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-network-wired text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-serif text-xl font-semibold text-primary mb-2">Network Architecture & Security</h3>
+                  <p class="text-secondary text-sm">Design VPCs, subnets, security groups, and implement IAM policies with least privilege access</p>
+                </div>
+              </div>
+
+              <div class="flex items-start space-x-4">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-rocket text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-serif text-xl font-semibold text-primary mb-2">CI/CD Pipeline Configuration</h3>
+                  <p class="text-secondary text-sm">Create Jenkins, GitLab CI, and GitHub Actions scripts for automated build, test, and deployment</p>
+                </div>
+              </div>
+
+              <div class="flex items-start space-x-4">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-chart-line text-white"></i>
+                </div>
+                <div>
+                  <h3 class="font-serif text-xl font-semibold text-primary mb-2">Monitoring, Logging & Alerting</h3>
+                  <p class="text-secondary text-sm">Set up Prometheus, Grafana, CloudWatch, and ELK stack for comprehensive observability</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Infrastructure as Code -->
+      <section id="iac" class="py-16 bg-slate-100">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12">Infrastructure as Code (IaC)</h2>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-cubes text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Modular Code Generation</h3>
+              <p class="text-secondary text-sm mb-4">Generate reusable Terraform modules for VPCs, databases, and other components</p>
+              <div class="bg-slate-50 p-4 rounded-lg text-xs font-mono text-primary">
+                "Generate a Terraform module for an AWS VPC with public and private subnets, NAT gateways, and an internet gateway" <a href="https://www.zibtek.com/blog/mastering-devops-essential-chatgpt-prompts-to-boost/" class="citation-link" target="_blank">[529]</a>
+              </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-server text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Resource Provisioning</h3>
+              <p class="text-secondary text-sm mb-4">Automate provisioning of compute, storage, and network resources with proper sizing</p>
+              <div class="bg-slate-50 p-4 rounded-lg text-xs font-mono text-primary">
+                "Write a Terraform script to provision an AWS EC2 instance of type t3.medium with an attached EBS volume of 100GB" <a href="https://www.linkedin.com/pulse/100-most-commonly-used-devops-prompts-chatgpt-khadar-basha-shaik-trgpc" class="citation-link" target="_blank">[526]</a>
+              </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-database text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">State Management</h3>
+              <p class="text-secondary text-sm mb-4">Configure remote state backends and manage resource dependencies</p>
+              <div class="bg-slate-50 p-4 rounded-lg text-xs font-mono text-primary">
+                "Set up a remote backend for Terraform using an S3 bucket and a DynamoDB table for state locking" <a href="https://www.linkedin.com/pulse/100-most-commonly-used-devops-prompts-chatgpt-khadar-basha-shaik-trgpc" class="citation-link" target="_blank">[526]</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Network Architecture -->
+      <section id="network-security" class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12">Network Architecture & Security</h2>
+
+          <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8">
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-4">VPC Design & Subnet Architecture</h3>
+                <p class="text-secondary mb-4">Design a well-structured VPC with public and private subnets across multiple availability zones</p>
+                <div class="bg-white p-4 rounded-lg border border-slate-200 text-sm font-mono text-primary">
+                  "Design a Terraform script to create a VPC with CIDR 10.0.0.0/16, with two public and two private subnets across two availability zones" <a href="https://www.zibtek.com/blog/mastering-devops-essential-chatgpt-prompts-to-boost/" class="citation-link" target="_blank">[529]</a>
+                </div>
+              </div>
+
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-4">Security Groups & Network ACLs</h3>
+                <p class="text-secondary mb-4">Configure firewall rules to control traffic flow and protect applications from unauthorized access</p>
+                <div class="bg-white p-4 rounded-lg border border-slate-200 text-sm text-secondary">
+                  Create security groups that allow inbound traffic on port 80 from anywhere and port 443 from specific IP ranges, with network ACLs for additional subnet-level security.
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <img src="https://kimi-img.moonshot.cn/pub/icon/spinner.svg" alt="Secure cloud network architecture diagram" class="w-full h-96 object-cover rounded-xl shadow-lg" size="large" aspect="wide" color="blue" style="photo" query="cloud network security architecture" referrerpolicy="no-referrer" />
+            </div>
+          </div>
+
+          <div class="mt-12 bg-primary/5 p-8 rounded-xl">
+            <h3 class="font-serif text-xl font-semibold text-primary mb-6">IAM Policies & Least Privilege Access</h3>
+            <p class="text-secondary mb-6">Implement the principle of least privilege by generating IAM policies and roles with minimum required permissions</p>
+
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="bg-white p-4 rounded-lg">
+                <h4 class="font-medium text-primary mb-2">Example IAM Role</h4>
+                <div class="text-sm font-mono text-secondary">
+                  "Create an IAM role for an EC2 instance that allows it to read from an S3 bucket and write to a CloudWatch log group"
+                </div>
+              </div>
+
+              <div class="bg-white p-4 rounded-lg">
+                <h4 class="font-medium text-primary mb-2">Security Best Practices</h4>
+                <ul class="text-sm text-secondary space-y-1">
+                  <li>• No wildcard permissions</li>
+                  <li>• Granular resource-level permissions</li>
+                  <li>• Regular permission auditing</li>
+                  <li>• Automated policy generation</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CI/CD Pipeline -->
+      <section id="cicd" class="py-16 bg-slate-100">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12">CI/CD Pipeline Configuration</h2>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fab fa-jenkins text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Pipeline Scripts</h3>
+              <p class="text-secondary text-sm mb-4">Generate configuration files for Jenkins, GitLab CI, GitHub Actions, and other CI/CD platforms</p>
+              <div class="bg-slate-50 p-4 rounded-lg text-xs font-mono text-primary">
+                "Create a Jenkins pipeline script for a Node.js application that includes stages for building, testing, and deploying to a Kubernetes cluster" <a href="https://www.zibtek.com/blog/mastering-devops-essential-chatgpt-prompts-to-boost/" class="citation-link" target="_blank">[529]</a>
+              </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-robot text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Automated Stages</h3>
+              <p class="text-secondary text-sm mb-4">Automate build, test, and deployment stages with parallel execution for faster pipelines</p>
+              <ul class="text-xs text-secondary space-y-1">
+                <li>• Docker image building</li>
+                <li>• Unit and integration tests</li>
+                <li>• Helm chart deployment</li>
+                <li>• Parallel test execution</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-shield-alt text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Security Integration</h3>
+              <p class="text-secondary text-sm mb-4">Integrate security scanning and quality gates into the pipeline</p>
+              <ul class="text-xs text-secondary space-y-1">
+                <li>• Trivy for container vulnerability scanning</li>
+                <li>• SonarQube for code quality analysis</li>
+                <li>• Automated security gates</li>
+                <li>• Compliance checking</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Monitoring & Logging -->
+      <section id="monitoring" class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12">Monitoring, Logging & Alerting</h2>
+
+          <div class="grid lg:grid-cols-2 gap-12">
+            <div class="space-y-8">
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-4 flex items-center">
+                  <i class="fas fa-chart-line mr-3"></i>
+                  Monitoring Tools Setup
+                </h3>
+                <p class="text-secondary mb-4">Configure Prometheus, Grafana, and CloudWatch for comprehensive infrastructure and application monitoring</p>
+                <div class="bg-white p-4 rounded-lg border border-slate-200 text-sm font-mono text-primary">
+                  "Set up Prometheus to monitor a Kubernetes cluster and create a Grafana dashboard to display CPU and memory usage of the pods" <a href="https://www.zibtek.com/blog/mastering-devops-essential-chatgpt-prompts-to-boost/" class="citation-link" target="_blank">[529]</a>
+                </div>
+              </div>
+
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-4 flex items-center">
+                  <i class="fas fa-file-alt mr-3"></i>
+                  Log Aggregation
+                </h3>
+                <p class="text-secondary mb-4">Configure ELK stack or Fluentd for centralized log collection and analysis</p>
+                <div class="bg-white p-4 rounded-lg border border-slate-200 text-sm font-mono text-primary">
+                  "Configure Fluentd to collect logs from a Docker container and send them to an Elasticsearch cluster" <a href="https://www.zibtek.com/blog/mastering-devops-essential-chatgpt-prompts-to-boost/" class="citation-link" target="_blank">[529]</a>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <img src="https://kimi-img.moonshot.cn/pub/icon/spinner.svg" alt="Modern server room with monitoring screens" class="w-full h-80 object-cover rounded-xl shadow-lg mb-8" size="medium" aspect="wide" style="photo" query="server room monitoring screens" referrerpolicy="no-referrer" />
+
+              <div class="bg-primary/5 p-6 rounded-xl">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-4">Alert Rules & Thresholds</h3>
+                <p class="text-secondary mb-4">Define intelligent alert rules with appropriate thresholds to proactively identify issues</p>
+                <div class="bg-white p-4 rounded-lg border border-slate-200 text-sm text-secondary">
+                  "Create an alert rule in Prometheus that fires when the CPU usage of a pod exceeds 80% for more than 5 minutes"
+                </div>
+                <div class="mt-4 space-y-2 text-sm text-secondary">
+                  <div class="flex items-center">
+                    <i class="fas fa-bell text-primary mr-2"></i>
+                    <span>Slack and PagerDuty integrations</span>
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-mobile-alt text-primary mr-2"></i>
+                    <span>Multi-channel notification support</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Software Configuration -->
+      <section id="software-config" class="py-16 bg-slate-100">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12">Software Installation & Configuration</h2>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-playbook text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Ansible Playbooks</h3>
+              <p class="text-secondary text-sm mb-4">Generate Ansible playbooks or shell scripts for automated software setup</p>
+              <div class="bg-slate-50 p-4 rounded-lg text-xs font-mono text-primary">
+                "Write an Ansible playbook to install and configure Nginx on a group of Ubuntu servers" <a href="https://www.zibtek.com/blog/mastering-devops-essential-chatgpt-prompts-to-boost/" class="citation-link" target="_blank">[529]</a>
+              </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-cog text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Dependency Configuration</h3>
+              <p class="text-secondary text-sm mb-4">Configure web servers, databases, and application dependencies</p>
+              <div class="bg-slate-50 p-4 rounded-lg text-xs text-secondary">
+                "Configure Nginx to serve a Node.js application on port 3000"
+              </div>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-sync-alt text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Configuration Management</h3>
+              <p class="text-secondary text-sm mb-4">Manage configuration drift and ensure consistency across environments</p>
+              <div class="bg-slate-50 p-4 rounded-lg text-xs text-secondary">
+                "Write an Ansible playbook that ensures Nginx configuration is always in desired state"
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Advanced Capabilities -->
+      <section id="advanced-capabilities" class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12 text-center">Advanced Capabilities & Best Practices</h2>
+
+          <p class="text-lg text-secondary text-center leading-relaxed mb-12 max-w-4xl mx-auto">
+            Beyond core infrastructure components, ChatGPT-5 can assist with advanced DevOps practices including multi-cloud deployments, security automation, cost optimization, and troubleshooting.
+          </p>
+
+          <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <img src="https://kimi-img.moonshot.cn/pub/icon/spinner.svg" alt="Multi-cloud infrastructure architecture" class="w-full h-80 object-cover rounded-xl shadow-lg" size="medium" aspect="wide" style="photo" query="multi-cloud infrastructure" referrerpolicy="no-referrer" />
+            </div>
+
+            <div class="space-y-6">
+              <div class="bg-primary/5 p-6 rounded-xl">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-4">Multi-Cloud & Hybrid Deployments</h3>
+                <p class="text-secondary text-sm mb-4">Design portable, cloud-agnostic architectures that avoid vendor lock-in</p>
+                <ul class="text-sm text-secondary space-y-1">
+                  <li>• AWS, Azure, and GCP orchestration</li>
+                  <li>• Cross-cloud networking with VPN connections</li>
+                  <li>• Kubernetes for container orchestration</li>
+                  <li>• Terraform for multi-cloud IaC</li>
+                </ul>
+              </div>
+
+              <div class="bg-primary/5 p-6 rounded-xl">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-4">Security & Compliance Automation</h3>
+                <p class="text-secondary text-sm mb-4">Automate security policy enforcement and compliance standards</p>
+                <ul class="text-sm text-secondary space-y-1">
+                  <li>• SOC 2, HIPAA, PCI-DSS compliant configurations</li>
+                  <li>• Automated security scanning and guardrails</li>
+                  <li>• Least privilege IAM policies</li>
+                  <li>• Encryption at rest and in transit</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Multi-Cloud -->
+      <section id="multi-cloud" class="py-16 bg-slate-100">
+        <div class="max-w-4xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-8">Multi-Cloud & Hybrid Deployments</h2>
+
+          <div class="prose prose-lg max-w-none">
+            <p class="text-lg text-secondary leading-relaxed mb-6">
+              In today's complex IT landscape, many organizations are adopting multi-cloud or hybrid cloud strategies to avoid vendor lock-in, improve resilience, and leverage the best services from different providers.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 my-8">
+              <div class="bg-white p-6 rounded-xl shadow-sm">
+                <h4 class="font-serif text-lg font-semibold text-primary mb-4">Resource Orchestration</h4>
+                <p class="text-secondary text-sm mb-4">Generate IaC scripts that work across multiple cloud providers</p>
+                <ul class="text-xs text-secondary space-y-1">
+                  <li>• Terraform for AWS + Azure deployments</li>
+                  <li>• Cross-cloud VPN connections</li>
+                  <li>• Multi-region disaster recovery</li>
+                  <li>• Global load balancing</li>
+                </ul>
+              </div>
+
+              <div class="bg-white p-6 rounded-xl shadow-sm">
+                <h4 class="font-serif text-lg font-semibold text-primary mb-4">Portability Design</h4>
+                <p class="text-secondary text-sm mb-4">Use cloud-agnostic technologies to enable easy migration</p>
+                <ul class="text-xs text-secondary space-y-1">
+                  <li>• Kubernetes for container orchestration</li>
+                  <li>• Open-source tools over vendor-specific</li>
+                  <li>• Standardized APIs and interfaces</li>
+                  <li>• Abstraction layers for cloud services</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="bg-primary/5 border-l-4 border-primary p-6 rounded-r-lg">
+              <h4 class="font-serif text-lg font-semibold text-primary mb-3">Key Benefits</h4>
+              <ul class="text-secondary space-y-2">
+                <li class="flex items-start">
+                  <i class="fas fa-shield-alt text-primary mt-1 mr-3"></i>
+                  <span>Improved resilience through cloud diversity</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-dollar-sign text-primary mt-1 mr-3"></i>
+                  <span>Cost optimization across providers</span>
+                </li>
+                <li class="flex items-start">
+                  <i class="fas fa-globe text-primary mt-1 mr-3"></i>
+                  <span>Compliance with data sovereignty requirements</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Security & Compliance -->
+      <section id="security-compliance" class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12">Security & Compliance Automation</h2>
+
+          <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8">
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-4">Security Policy Enforcement</h3>
+                <p class="text-secondary mb-4">Generate configurations that adhere to security best practices and implement automated guardrails</p>
+                <ul class="text-sm text-secondary space-y-2">
+                  <li class="flex items-center">
+                    <i class="fas fa-lock text-primary mr-2"></i>
+                    <span>Least privilege IAM policies</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-firewall text-primary mr-2"></i>
+                    <span>Restricted security group rules</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-scan text-primary mr-2"></i>
+                    <span>Automated vulnerability scanning</span>
+                  </li>
+                  <li class="flex items-center">
+                    <i class="fas fa-certificate text-primary mr-2"></i>
+                    <span>SSL/TLS configuration</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h3 class="font-serif text-xl font-semibold text-primary mb-4">Compliance Standards</h3>
+                <p class="text-secondary mb-4">Generate configurations that meet industry compliance requirements</p>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                  <div class="bg-white p-3 rounded-lg border border-slate-200">
+                    <div class="font-semibold text-primary text-sm">SOC 2</div>
+                    <div class="text-xs text-secondary">Security controls</div>
+                  </div>
+                  <div class="bg-white p-3 rounded-lg border border-slate-200">
+                    <div class="font-semibold text-primary text-sm">HIPAA</div>
+                    <div class="text-xs text-secondary">Healthcare data</div>
+                  </div>
+                  <div class="bg-white p-3 rounded-lg border border-slate-200">
+                    <div class="font-semibold text-primary text-sm">PCI DSS</div>
+                    <div class="text-xs text-secondary">Payment data</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <img src="https://kimi-img.moonshot.cn/pub/icon/spinner.svg" alt="Cloud security compliance certification" class="w-full h-80 object-cover rounded-xl shadow-lg" size="medium" aspect="wide" style="photo" query="cloud security compliance" referrerpolicy="no-referrer" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cost Optimization -->
+      <section id="cost-optimization" class="py-16 bg-slate-100">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12">Cost Optimization & FinOps</h2>
+
+          <div class="grid lg:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-chart-pie text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Cloud Spend Analysis</h3>
+              <p class="text-secondary text-sm mb-4">Generate reports that break down costs by service, region, or project</p>
+              <ul class="text-xs text-secondary space-y-1">
+                <li>• Identify underutilized resources</li>
+                <li>• Rightsizing recommendations</li>
+                <li>• Idle resource detection</li>
+                <li>• Cost allocation tagging</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-server text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Instance Optimization</h3>
+              <p class="text-secondary text-sm mb-4">Recommend cost-effective instance types and storage tiers</p>
+              <ul class="text-xs text-secondary space-y-1">
+                <li>• Spot instances for non-critical workloads</li>
+                <li>• Reserved instances for steady workloads</li>
+                <li>• Auto-scaling optimization</li>
+                <li>• Storage tier recommendations</li>
+              </ul>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-sm">
+              <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                <i class="fas fa-clock text-white"></i>
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-primary mb-4">Resource Scheduling</h3>
+              <p class="text-secondary text-sm mb-4">Implement automated start/stop schedules for development environments</p>
+              <ul class="text-xs text-secondary space-y-1">
+                <li>• Off-hours shutdown policies</li>
+                <li>• Development environment scaling</li>
+                <li>• Automated cleanup jobs</li>
+                <li>• Lifecycle management</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Troubleshooting -->
+      <section id="troubleshooting" class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-8">Troubleshooting & Debugging</h2>
+
+          <div class="prose prose-lg max-w-none">
+            <p class="text-lg text-secondary leading-relaxed mb-6">
+              When issues arise in complex infrastructure, ChatGPT-5 can be a valuable tool for troubleshooting and debugging by analyzing error logs and suggesting potential remediations.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 my-8">
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h4 class="font-serif text-lg font-semibold text-primary mb-4">Log Analysis</h4>
+                <p class="text-secondary text-sm mb-4">Analyze error logs from various sources to identify patterns and suggest causes</p>
+                <ul class="text-xs text-secondary space-y-1">
+                  <li>• Application log correlation</li>
+                  <li>• System log analysis</li>
+                  <li>• Performance bottleneck identification</li>
+                  <li>• Error pattern recognition</li>
+                </ul>
+              </div>
+
+              <div class="bg-slate-50 p-6 rounded-xl">
+                <h4 class="font-serif text-lg font-semibold text-primary mb-4">Root Cause Analysis</h4>
+                <p class="text-secondary text-sm mb-4">Assist with structured RCA process for major incidents</p>
+                <ul class="text-xs text-secondary space-y-1">
+                  <li>• Incident timeline reconstruction</li>
+                  <li>• Contributing factor identification</li>
+                  <li>• Preventive measure recommendations</li>
+                  <li>• Documentation and reporting</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="bg-primary/5 border-l-4 border-primary p-6 rounded-r-lg">
+              <h4 class="font-serif text-lg font-semibold text-primary mb-3">Troubleshooting Workflow</h4>
+              <ol class="text-secondary space-y-2">
+                <li class="flex items-start">
+                  <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">1</span>
+                  <span>Collect and aggregate relevant logs and metrics</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">2</span>
+                  <span>Analyze patterns and identify anomalies</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">3</span>
+                  <span>Suggest potential causes and solutions</span>
+                </li>
+                <li class="flex items-start">
+                  <span class="bg-primary text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5">4</span>
+                  <span>Document findings and preventive measures</span>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sample Scenarios -->
+      <section id="sample-scenarios" class="py-16 bg-slate-100">
+        <div class="max-w-6xl mx-auto px-6">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-12 text-center">Sample Prompts for Specific Scenarios</h2>
+
+          <p class="text-lg text-secondary text-center leading-relaxed mb-12 max-w-4xl mx-auto">
+            To illustrate the practical application of these principles, here are sample prompts for common DevOps scenarios. These prompts are designed to be comprehensive and can be adapted to fit specific project requirements.
+          </p>
+
+          <div class="grid gap-8">
+            <!-- AWS Web App -->
+            <div id="aws-web-app" class="bg-white p-8 rounded-xl shadow-sm">
+              <h3 class="font-serif text-2xl font-semibold text-primary mb-6">Deploying a Scalable Web Application on AWS</h3>
+
+              <div class="bg-slate-50 p-6 rounded-xl mb-6">
+                <div class="font-mono text-sm text-primary whitespace-pre-wrap">
+                  <strong>Role:</strong> You are a Senior DevOps Engineer with 10+ years of experience in designing and managing highly available, scalable, and secure cloud infrastructure on AWS.
+
+                  <strong>Task:</strong> Design and implement a complete, production-ready infrastructure for a scalable web application.
+
+                  <strong>Application Details:</strong>
+                  • Type: A 3-tier web application (presentation, application, and database layers)
+                  • Technology Stack: Node.js application layer with PostgreSQL database
+                  • Traffic: Expected to handle 10,000 concurrent users at peak
+
+                  <strong>Cloud Provider and Technology Stack:</strong>
+                  • Provider: AWS
+                  • IaC Tool: Terraform
+                  • CI/CD Tool: GitHub Actions
+                  • Monitoring: CloudWatch and Grafana
+
+                  <strong>Constraints and Requirements:</strong>
+                  • High Availability: Deployed across multiple availability zones
+                  • Scalability: Auto-scale based on CPU utilization
+                  • Security: All data encrypted at rest and in transit
+                  • Cost Optimization: Use spot instances where appropriate
+
+                  <strong>Expected Output:</strong>
+                  • Modular Terraform scripts for VPC, ALB, Auto Scaling, RDS
+                  • GitHub Actions workflow for CI/CD
+                  • Monitoring configurations and dashboards
+                  • Detailed README with deployment instructions
+                </div>
+              </div>
+            </div>
+
+            <!-- Kubernetes on GCP -->
+            <div id="kubernetes-gcp" class="bg-white p-8 rounded-xl shadow-sm">
+              <h3 class="font-serif text-2xl font-semibold text-primary mb-6">Setting up a Kubernetes Cluster with Monitoring on GCP</h3>
+
+              <div class="bg-slate-50 p-6 rounded-xl mb-6">
+                <div class="font-mono text-sm text-primary whitespace-pre-wrap">
+                  <strong>Role:</strong> You are an expert Kubernetes administrator and Site Reliability Engineer with deep knowledge of Google Cloud Platform (GCP) and observability best practices.
+
+                  <strong>Task:</strong> Design and implement a production-grade Kubernetes cluster on GCP with comprehensive monitoring and logging solution.
+
+                  <strong>Application Details:</strong>
+                  • Type: Microservices-based application with 10 services
+                  • Technology Stack: Containerized with Docker, written in Go and Python
+
+                  <strong>Cloud Provider and Technology Stack:</strong>
+                  • Provider: Google Cloud Platform (GCP)
+                  • IaC Tool: Terraform
+                  • Kubernetes Service: Google Kubernetes Engine (GKE)
+                  • Monitoring: Prometheus, Grafana, Google Cloud Monitoring
+                  • Logging: Fluentd, Elasticsearch, and Kibana (EFK stack)
+
+                  <strong>Constraints and Requirements:</strong>
+                  • High Availability: Regional cluster with nodes across multiple zones
+                  • Security: Private endpoint with Workload Identity
+                  • Monitoring: Collect metrics with pre-built Grafana dashboards
+                  • Logging: Centralized log aggregation and Kibana search
+
+                  <strong>Expected Output:</strong>
+                  • Terraform scripts for private GKE cluster and monitoring infrastructure
+                  • Kubernetes manifests for Prometheus, Grafana, Fluentd, Kibana
+                  • Pre-configured Grafana dashboards
+                  • Access guide for monitoring and logging
+                </div>
+              </div>
+            </div>
+
+            <!-- Secure CI/CD -->
+            <div id="secure-cicd" class="bg-white p-8 rounded-xl shadow-sm">
+              <h3 class="font-serif text-2xl font-semibold text-primary mb-6">Creating a Secure CI/CD Pipeline for a Microservice</h3>
+
+              <div class="bg-slate-50 p-6 rounded-xl mb-6">
+                <div class="font-mono text-sm text-primary whitespace-pre-wrap">
+                  <strong>Role:</strong> You are a DevSecOps engineer with expertise in creating secure and automated CI/CD pipelines for containerized applications.
+
+                  <strong>Task:</strong> Design and implement a secure CI/CD pipeline for a Node.js microservice deployed to Kubernetes.
+
+                  <strong>Application Details:</strong>
+                  • Type: Node.js microservice
+                  • Containerization: Docker container
+
+                  <strong>Technology Stack:</strong>
+                  • CI/CD Tool: GitLab CI
+                  • Container Registry: GitLab Container Registry
+                  • Deployment Target: Kubernetes cluster
+                  • Security Scanning: SAST (SonarQube), DAST (OWASP ZAP), Trivy
+
+                  <strong>Constraints and Requirements:</strong>
+                  • Security: SAST, DAST, and container vulnerability scanning
+                  • Quality Gates: Minimum 80% code coverage
+                  • Deployment Strategy: Canary deployment to minimize risk
+
+                  <strong>Expected Output:</strong>
+                  • Complete .gitlab-ci.yml pipeline definition
+                  • Dockerfile for application image
+                  • Kubernetes manifests for canary deployment
+                  • Security and quality gates documentation
+                </div>
+              </div>
+            </div>
+
+            <!-- Disaster Recovery -->
+            <div id="disaster-recovery" class="bg-white p-8 rounded-xl shadow-sm">
+              <h3 class="font-serif text-2xl font-semibold text-primary mb-6">Designing a Disaster Recovery Plan</h3>
+
+              <div class="bg-slate-50 p-6 rounded-xl mb-6">
+                <div class="font-mono text-sm text-primary whitespace-pre-wrap">
+                  <strong>Role:</strong> You are a Senior Infrastructure Architect with expertise in business continuity and disaster recovery planning for cloud-based applications.
+
+                  <strong>Task:</strong> Design a comprehensive disaster recovery (DR) plan for a critical e-commerce application hosted on AWS.
+
+                  <strong>Application Details:</strong>
+                  • Type: Monolithic e-commerce application
+                  • Technology Stack: Java with MySQL database
+
+                  <strong>Cloud Provider and Technology Stack:</strong>
+                  • Provider: AWS
+                  • Primary Region: us-east-1
+                  • DR Region: us-west-2
+                  • Database: Amazon RDS for MySQL with automated backups
+                  • Storage: Amazon S3 with cross-region replication
+
+                  <strong>Constraints and Requirements:</strong>
+                  • Recovery Time Objective (RTO): 4 hours
+                  • Recovery Point Objective (RPO): 1 hour
+                  • DR Strategy: Pilot light with minimal infrastructure always running
+
+                  <strong>Expected Output:</strong>
+                  • Detailed DR plan document with strategy overview
+                  • Step-by-step runbooks for failover and failback
+                  • List of AWS resources for DR region
+                  • Terraform scripts for pilot light infrastructure
+                  • Regular testing plan for DR validation
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Conclusion -->
+      <section class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+          <h2 class="font-serif text-3xl font-bold text-primary mb-8">Transform Your Infrastructure with AI</h2>
+
+          <p class="text-lg text-secondary leading-relaxed mb-8">
+            By following these structured prompting principles, you can transform ChatGPT-5 from a simple code generator into a collaborative DevOps partner capable of delivering complete, robust, and secure infrastructure solutions.
+          </p>
+
+          <div class="bg-primary/5 p-8 rounded-xl">
+            <blockquote class="font-serif text-xl italic text-primary mb-4">
+              "The key to successful AI-assisted infrastructure design lies not in the complexity of the prompts, but in their clarity, specificity, and structure."
+            </blockquote>
+            <p class="text-secondary">
+              Start with clear role definition, provide comprehensive context, specify expected outputs, and watch as AI becomes your most valuable DevOps team member.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Citations -->
+      <section class="py-12 bg-slate-100">
+        <div class="max-w-4xl mx-auto px-6">
+          <h3 class="font-serif text-2xl font-semibold text-primary mb-6">References</h3>
+          <div class="space-y-3 text-sm text-secondary">
+            <div>
+              <strong>[529]</strong>
+              <a href="https://www.zibtek.com/blog/mastering-devops-essential-chatgpt-prompts-to-boost/" class="citation-link" target="_blank">
+                Mastering DevOps: Essential ChatGPT Prompts to Boost Your Workflow - Zibtek
+              </a>
+            </div>
+            <div>
+              <strong>[536]</strong>
+              <a href="https://aws.plainenglish.io/the-prompt-library-that-saved-my-team-40-hours-this-week-71fae4c99234" class="citation-link" target="_blank">
+                The Prompt Library That Saved My Team 40 Hours This Week - AWS in Plain English
+              </a>
+            </div>
+            <div>
+              <strong>[526]</strong>
+              <a href="https://www.linkedin.com/pulse/100-most-commonly-used-devops-prompts-chatgpt-khadar-basha-shaik-trgpc" class="citation-link" target="_blank">
+                100 Most Commonly Used DevOps Prompts for ChatGPT - LinkedIn
+              </a>
+            </div>
+            <div>
+              <strong>[485]</strong>
+              <a href="https://www.linkedin.com/posts/ebangha-ebane_8-prompts-devop-engineer-can-use-activity-7355939165407965184-Nd04" class="citation-link" target="_blank">
+                8 Prompts DevOps Engineer Can Use - LinkedIn
+              </a>
+            </div>
+            <div>
+              <strong>[490]</strong>
+              <a href="https://www.zibtek.com/blog/mastering-devops-essential-chatgpt-prompts-to-boost/" class="citation-link" target="_blank">
+                Mastering DevOps: Essential ChatGPT Prompts to Boost Your Workflow - Zibtek
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+  </body>
+
+</html>
